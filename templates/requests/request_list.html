@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Blood Requests - BloodConnect{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-4">Blood Requests</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if user.is_authenticated and user.user_type == 'receiver' %}
+                <a href="{% url 'requests:create_request' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Create Request
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="blood_group" class="form-label">Blood Group</label>
+                    <select name="blood_group" id="blood_group" class="form-select">
+                        <option value="">All Blood Groups</option>
+                        {% for value, label in blood_groups %}
+                            <option value="{{ value }}" {% if request.GET.blood_group == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="city" class="form-label">City</label>
+                    <input type="text" name="city" id="city" class="form-control" 
+                           value="{{ request.GET.city }}" placeholder="Enter city">
+                </div>
+                <div class="col-md-4">
+                    <label for="urgency" class="form-label">Urgency</label>
+                    <select name="urgency" id="urgency" class="form-select">
+                        <option value="">All Urgency Levels</option>
+                        {% for value, label in urgency_levels %}
+                            <option value="{{ value }}" {% if request.GET.urgency == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter me-2"></i>Apply Filters
+                    </button>
+                    <a href="{% url 'requests:request_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>Clear Filters
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Requests List -->
+    <div class="row">
+        {% for blood_request in requests %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span class="blood-group">{{ blood_request.blood_group }}</span>
+                        {% if blood_request.urgency == 'emergency' %}
+                            <span class="badge bg-danger">Emergency</span>
+                        {% elif blood_request.urgency == 'urgent' %}
+                            <span class="badge bg-warning text-dark">Urgent</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ blood_request.hospital_name }}</h5>
+                        <p class="card-text">
+                            <strong>Units Needed:</strong> {{ blood_request.units_needed }}<br>
+                            <strong>Required Date:</strong> {{ blood_request.required_date }}<br>
+                            <strong>Location:</strong> {{ blood_request.hospital_address }}
+                        </p>
+                        <p class="card-text">
+                            <small class="text-muted">
+                                Posted {{ blood_request.created_at|timesince }} ago
+                            </small>
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{% url 'requests:request_detail' blood_request.id %}" class="btn btn-primary w-100">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No blood requests found matching your criteria.
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

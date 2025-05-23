@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Request Details - BloodConnect{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <!-- Request Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="card-title mb-1">{{ request.blood_group }} Blood Request</h2>
+                        <p class="text-muted mb-0">Posted {{ request.created_at|timesince }} ago</p>
+                    </div>
+                    <span class="badge bg-{{ request.status|lower }} fs-6">{{ request.get_status_display }}</span>
+                </div>
+
+                <!-- Request Details -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5 class="mb-3">Request Details</h5>
+                        <p><i class="fas fa-tint me-2"></i><strong>Blood Group:</strong> {{ request.blood_group }}</p>
+                        <p><i class="fas fa-vial me-2"></i><strong>Units Needed:</strong> {{ request.units_needed }}</p>
+                        <p><i class="fas fa-calendar me-2"></i><strong>Required By:</strong> {{ request.required_date|date:"F d, Y" }}</p>
+                        <p><i class="fas fa-exclamation-circle me-2"></i><strong>Urgency:</strong> {{ request.get_urgency_display }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="mb-3">Hospital Information</h5>
+                        <p><i class="fas fa-hospital me-2"></i><strong>Hospital:</strong> {{ request.hospital_name }}</p>
+                        <p><i class="fas fa-map-marker-alt me-2"></i><strong>Address:</strong> {{ request.hospital_address }}</p>
+                    </div>
+                </div>
+
+                <!-- Reason -->
+                <div class="mb-4">
+                    <h5>Reason for Request</h5>
+                    <p class="mb-0">{{ request.reason }}</p>
+                </div>
+
+                <!-- Requester Information -->
+                <div class="mb-4">
+                    <h5>Requester Information</h5>
+                    <p><i class="fas fa-user me-2"></i><strong>Name:</strong> {{ request.requester.get_full_name|default:request.requester.username }}</p>
+                    <p><i class="fas fa-phone me-2"></i><strong>Phone:</strong> {{ request.requester.phone_number }}</p>
+                    <p><i class="fas fa-envelope me-2"></i><strong>Email:</strong> {{ request.requester.email }}</p>
+                </div>
+
+                <!-- Donor Information (if accepted) -->
+                {% if request.donor %}
+                    <div class="mb-4">
+                        <h5>Donor Information</h5>
+                        <p><i class="fas fa-user me-2"></i><strong>Name:</strong> {{ request.donor.user.get_full_name|default:request.donor.user.username }}</p>
+                        <p><i class="fas fa-phone me-2"></i><strong>Phone:</strong> {{ request.donor.user.phone_number }}</p>
+                        <p><i class="fas fa-envelope me-2"></i><strong>Email:</strong> {{ request.donor.user.email }}</p>
+                    </div>
+                {% endif %}
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2">
+                    {% if can_accept %}
+                        <a href="{% url 'bloodconnectapp:accept_request' request.id %}" class="btn btn-primary">
+                            <i class="fas fa-hand-holding-medical me-2"></i>Accept Request
+                        </a>
+                    {% endif %}
+
+                    {% if request.status == 'accepted' and request.donor.user == user or request.requester == user %}
+                        <a href="{% url 'bloodconnectapp:complete_request' request.id %}" class="btn btn-success">
+                            <i class="fas fa-check me-2"></i>Mark as Completed
+                        </a>
+                    {% endif %}
+
+                    {% if request.status == 'pending' and request.requester == user %}
+                        <a href="{% url 'bloodconnectapp:cancel_request' request.id %}" class="btn btn-danger">
+                            <i class="fas fa-times me-2"></i>Cancel Request
+                        </a>
+                    {% endif %}
+
+                    <a href="{% url 'bloodconnectapp:request_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

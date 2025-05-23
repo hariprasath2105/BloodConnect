@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Create Blood Request - BloodConnect{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="text-center mb-4">Create Blood Request</h2>
+                <p class="text-muted text-center mb-4">
+                    Fill in the details below to create a new blood request. Make sure to provide accurate information.
+                </p>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Create Request</button>
+                        <a href="{% url 'bloodconnectapp:request_list' %}" class="btn btn-outline-secondary">Back to Requests</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

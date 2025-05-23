@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Register as Donor - BloodConnect{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="text-center mb-4">Register as a Donor</h2>
+                <p class="text-muted text-center mb-4">
+                    Complete your donor profile to start helping others in need of blood.
+                </p>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Complete Registration</button>
+                        <a href="{% url 'bloodconnectapp:profile' %}" class="btn btn-outline-secondary">Back to Profile</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

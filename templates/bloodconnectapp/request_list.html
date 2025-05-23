@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Blood Requests - BloodConnect{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Filters -->
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="card-title">Filters</h4>
+                <form method="get" class="mb-0">
+                    <div class="mb-3">
+                        <label for="blood_group" class="form-label">Blood Group</label>
+                        <select name="blood_group" id="blood_group" class="form-select">
+                            <option value="">All Blood Groups</option>
+                            {% for code, name in blood_groups %}
+                                <option value="{{ code }}" {% if request.GET.blood_group == code %}selected{% endif %}>
+                                    {{ name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" name="city" id="city" class="form-control" 
+                               value="{{ request.GET.city }}" placeholder="Enter city">
+                    </div>
+                    <div class="mb-3">
+                        <label for="urgency" class="form-label">Urgency</label>
+                        <select name="urgency" id="urgency" class="form-select">
+                            <option value="">All Urgencies</option>
+                            {% for code, name in urgency_levels %}
+                                <option value="{{ code }}" {% if request.GET.urgency == code %}selected{% endif %}>
+                                    {{ name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Apply Filters</button>
+                        <a href="{% url 'bloodconnectapp:request_list' %}" class="btn btn-outline-secondary">Clear Filters</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Request List -->
+    <div class="col-md-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Blood Requests</h2>
+            {% if user.is_authenticated and user.user_type == 'receiver' %}
+                <a href="{% url 'bloodconnectapp:create_request' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Create Request
+                </a>
+            {% endif %}
+        </div>
+
+        {% if requests %}
+            <div class="row g-4">
+                {% for request in requests %}
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge bg-{{ request.urgency|lower }}">{{ request.urgency }}</span>
+                                    <small class="text-muted">{{ request.created_at|timesince }} ago</small>
+                                </div>
+                                <h5 class="card-title">{{ request.blood_group }} Blood Needed</h5>
+                                <p class="card-text">
+                                    <i class="fas fa-hospital me-2"></i>{{ request.hospital_name }}<br>
+                                    <i class="fas fa-map-marker-alt me-2"></i>{{ request.requester.city }}<br>
+                                    <i class="fas fa-tint me-2"></i>{{ request.units_needed }} units needed<br>
+                                    <i class="fas fa-calendar me-2"></i>Required by: {{ request.required_date|date:"M d, Y" }}
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">Posted by {{ request.requester.get_full_name|default:request.requester.username }}</span>
+                                    <a href="{% url 'bloodconnectapp:request_detail' request.id %}" class="btn btn-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                No blood requests found matching your criteria.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

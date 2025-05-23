@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - BloodConnect{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="py-5 text-center">
+    <div class="row py-lg-5">
+        <div class="col-lg-6 col-md-8 mx-auto">
+            <h1 class="fw-bold">Save Lives Through Blood Donation</h1>
+            <p class="lead text-muted">Join our community of blood donors and help those in need. Every drop counts!</p>
+            {% if not user.is_authenticated %}
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <a href="{% url 'bloodconnectapp:register' %}" class="btn btn-primary btn-lg px-4 gap-3">Get Started</a>
+                    <a href="{% url 'bloodconnectapp:request_list' %}" class="btn btn-outline-secondary btn-lg px-4">Find Requests</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-3x mb-3"></i>
+                    <h3 class="card-title">{{ total_donors }}</h3>
+                    <p class="card-text">Active Donors</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-heartbeat fa-3x mb-3"></i>
+                    <h3 class="card-title">{{ pending_requests }}</h3>
+                    <p class="card-text">Pending Requests</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-hand-holding-medical fa-3x mb-3"></i>
+                    <h3 class="card-title">24/7</h3>
+                    <p class="card-text">Emergency Support</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Requests Section -->
+<section class="py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Recent Blood Requests</h2>
+        <a href="{% url 'bloodconnectapp:request_list' %}" class="btn btn-outline-primary">View All</a>
+    </div>
+    <div class="row g-4">
+        {% for request in recent_requests %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge bg-{{ request.urgency|lower }}">{{ request.urgency }}</span>
+                            <small class="text-muted">{{ request.created_at|timesince }} ago</small>
+                        </div>
+                        <h5 class="card-title">{{ request.blood_group }} Blood Needed</h5>
+                        <p class="card-text">
+                            <i class="fas fa-hospital me-2"></i>{{ request.hospital_name }}<br>
+                            <i class="fas fa-map-marker-alt me-2"></i>{{ request.requester.city }}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted">{{ request.units_needed }} units needed</span>
+                            <a href="{% url 'bloodconnectapp:request_detail' request.id %}" class="btn btn-sm btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No blood requests at the moment.
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5">
+    <h2 class="text-center mb-5">How It Works</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
+                    <h4>1. Register</h4>
+                    <p class="card-text">Create an account as a donor or receiver to get started.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-search fa-3x text-primary mb-3"></i>
+                    <h4>2. Connect</h4>
+                    <p class="card-text">Find blood requests or create one if you're in need.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-handshake fa-3x text-primary mb-3"></i>
+                    <h4>3. Donate</h4>
+                    <p class="card-text">Connect with the requester and save a life through donation.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

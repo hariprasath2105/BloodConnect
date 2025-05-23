@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Create Blood Request - BloodConnect{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Create Blood Request</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.blood_group|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.units_needed|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.hospital_name|as_crispy_field }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.hospital_address|as_crispy_field }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.reason|as_crispy_field }}
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.urgency|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.required_date|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Submit Request
+                            </button>
+                            <a href="{% url 'requests:request_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Set minimum date for required_date to today
+    document.addEventListener('DOMContentLoaded', function() {
+        const requiredDateInput = document.querySelector('#id_required_date');
+        const today = new Date().toISOString().split('T')[0];
+        requiredDateInput.min = today;
+    });
+</script>
+{% endblock %} 

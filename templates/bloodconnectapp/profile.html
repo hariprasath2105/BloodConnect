@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Profile - BloodConnect{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Profile Information -->
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3 class="card-title">Profile Information</h3>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% if user.user_type == 'donor' %}
+            {% if donor_profile %}
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="card-title">Donor Information</h3>
+                        <p><strong>Blood Group:</strong> {{ donor_profile.blood_group }}</p>
+                        <p><strong>Age:</strong> {{ donor_profile.age }}</p>
+                        <p><strong>Gender:</strong> {{ donor_profile.get_gender_display }}</p>
+                        <p><strong>Status:</strong> 
+                            <span class="badge {% if donor_profile.is_available %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ donor_profile.is_available|yesno:"Available,Unavailable" }}
+                            </span>
+                        </p>
+                        <div class="d-grid">
+                            <a href="{% url 'bloodconnectapp:edit_donor_profile' %}" class="btn btn-outline-primary">Edit Donor Profile</a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="card-title">Become a Donor</h3>
+                        <p>Complete your donor profile to start helping others.</p>
+                        <div class="d-grid">
+                            <a href="{% url 'bloodconnectapp:register_donor' %}" class="btn btn-primary">Register as Donor</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <!-- Blood Requests -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="card-title mb-0">Your Blood Requests</h3>
+                    {% if user.user_type == 'receiver' %}
+                        <a href="{% url 'bloodconnectapp:create_request' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>New Request
+                        </a>
+                    {% endif %}
+                </div>
+
+                {% if blood_requests %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Blood Group</th>
+                                    <th>Units</th>
+                                    <th>Hospital</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for request in blood_requests %}
+                                    <tr>
+                                        <td>{{ request.blood_group }}</td>
+                                        <td>{{ request.units_needed }}</td>
+                                        <td>{{ request.hospital_name }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ request.status|lower }}">
+                                                {{ request.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ request.created_at|date:"M d, Y" }}</td>
+                                        <td>
+                                            <a href="{% url 'bloodconnectapp:request_detail' request.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            {% if request.status == 'pending' %}
+                                                <a href="{% url 'bloodconnectapp:cancel_request' request.id %}" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-times"></i>
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        {% if user.user_type == 'receiver' %}
+                            You haven't created any blood requests yet.
+                        {% else %}
+                            You haven't accepted any blood requests yet.
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
