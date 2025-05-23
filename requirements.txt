@@ -5,3 +5,4 @@ django-crispy-forms
 crispy-bootstrap5
 gunicorn
 whitenoise[brotli]
+dj-database-url   
