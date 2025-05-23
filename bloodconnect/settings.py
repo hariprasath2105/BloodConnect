@@ -14,7 +14,16 @@ SECRET_KEY = 'django-insecure-t^76+c*%01y73v%d1r(j13jpz@hw-@hj(s-87mqyda(yh0dd_!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+
+# Render automatically exposes this env var at runtime
+RENDER_HOST = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+if RENDER_HOST:                         # e.g. bloodconnect-owv3.onrender.com
+    ALLOWED_HOSTS.append(RENDER_HOST)
+
+if RENDER_HOST:
+    CSRF_TRUSTED_ORIGINS = [f"https://{RENDER_HOST}"]
+
 
 # Application definition
 INSTALLED_APPS = [
